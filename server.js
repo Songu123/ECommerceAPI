@@ -3,6 +3,9 @@ const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const cors = require('cors');
 const app = express();
+const { swaggerUi, swaggerSpec } = require('./config/swagger');
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 dotenv.config();
 connectDB(); // Added parentheses to call the function
