@@ -7,7 +7,8 @@ const {
   updateProduct,
   deleteProduct,
 } = require('../controllers/productController');
-const { protect, isAdmin } = require('../middleware/authMiddleware');
+const { protect, isAdmin } = require('../middlewares/authMiddleware');
+const upload = require('../middlewares/uploadImage');
 
 /**
  * @swagger
@@ -47,7 +48,7 @@ router.get('/', getProducts);
  *       201:
  *         description: Tạo sản phẩm thành công
  */
-router.post('/', protect, isAdmin, createProduct);
+router.post('/',upload.single('image'), protect, isAdmin, createProduct);
 
 /**
  * @swagger

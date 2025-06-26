@@ -198,8 +198,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
     });
 
     res.json({
-      message: 'Email đặt lại mật khẩu đã được gửi',
-      resetToken,
+      message: 'Email đặt lại mật khẩu đã được gửi!Vui lòng kiểm tra hộp thư đến email của bạn.',
     });
   } catch (err) {
     user.resetPasswordToken = undefined;

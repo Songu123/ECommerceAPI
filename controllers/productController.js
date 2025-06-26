@@ -17,11 +17,24 @@ const getProducts = asyncHandler(async (req, res) => {
 
 // CREATE
 const createProduct = asyncHandler(async (req, res) => {
-  const newProduct = new Product(req.body);
+  // Lấy thông tin sản phẩm từ body (form-data)
+  const { title, desc, categories, size, color, price } = req.body;
 
+  // Đường dẫn ảnh đã upload lên server
+  const img = req.file ? `/uploads/${req.file.filename}` : '';
+
+  const product = new Product({
+    title,
+    desc,
+    img,
+    categories,
+    size,
+    color,
+    price: parseFloat(price),
+  })
   try {
-    const saveProduct = await newProduct.save();
-    res.status(200).json(saveProduct);
+    const savedProduct = await product.save();
+    res.status(200).json(savedProduct);
   } catch (err) {
     res.status(500).json(err);
   }
