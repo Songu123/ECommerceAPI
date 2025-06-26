@@ -95,7 +95,7 @@ userSchema.statics.findByEmail = function (email) {
 };
 
 // Create a compound index to optimize queries
-userSchema.index({ email: 1 });
+// userSchema.index({ email: 1 });
 
 userSchema.methods.createPasswordResetToken = function () {
   const resetToken = crypto.randomBytes(32).toString('hex');
