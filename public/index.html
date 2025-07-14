@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Simple Chat Room</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+  <style>
+    #messages { height: 350px; overflow-y: auto; background: #f8f9fa; margin-bottom: 1rem; border-radius: 8px; padding: 10px; border: 1px solid #dee2e6; }
+  </style>
+</head>
+<body>
+<div class="container mt-5">
+  <h2 class="mb-4 text-center">Simple Chat Room</h2>
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="mb-2">
+        <input id="room" type="text" class="form-control" placeholder="Nhập tên hoặc ID phòng chat">
+        <button id="join" class="btn btn-primary w-100 mt-2">Tham gia phòng</button>
+      </div>
+      <div id="messages"></div>
+      <div class="input-group">
+        <input id="messageInput" type="text" class="form-control" placeholder="Nhập tin nhắn...">
+        <button id="sendBtn" class="btn btn-success">Gửi</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  const socket = io('http://localhost:3000');
+  let currentRoom = '';
+  let username = 'User_' + Math.floor(Math.random() * 1000);
+
+  document.getElementById('join').onclick = function () {
+    const roomInput = document.getElementById('room').value.trim();
+    if(roomInput) {
+      currentRoom = roomInput;
+      socket.emit('joinRoom', currentRoom);
+      document.getElementById('messages').innerHTML = '';
+      addMessage('Bạn đã tham gia phòng: ' + currentRoom, 'text-secondary');
+    }
+  };
+
+  socket.on('chatHistory', function(msgs) {
+    document.getElementById('messages').innerHTML = '';
+    msgs.forEach(msg => addMessage(`<b>${msg.sender}:</b> ${msg.text}`));
+  });
+
+  document.getElementById('sendBtn').onclick = sendMessage;
+  document.getElementById('messageInput').addEventListener('keyup', function(e) {
+    if(e.key === 'Enter') sendMessage();
+  });
+
+  function sendMessage() {
+    const input = document.getElementById('messageInput');
+    const text = input.value.trim();
+    if(text && currentRoom) {
+      socket.emit('sendMessage', {
+        chatRoom: currentRoom,
+        sender: username,
+        text: text
+      });
+      input.value = '';
+    }
+  }
+
+  socket.on('newMessage', function(msg) {
+    addMessage(`<b>${msg.sender}:</b> ${msg.text}`);
+  });
+
+  function addMessage(message, cls = '') {
+    const div = document.createElement('div');
+    div.innerHTML = message;
+    if(cls) div.className = cls;
+    document.getElementById('messages').appendChild(div);
+    document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+  }
+</script>
+</body>
+</html>
